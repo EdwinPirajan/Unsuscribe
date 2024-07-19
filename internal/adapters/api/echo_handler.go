@@ -26,5 +26,5 @@ func (h *Handler) Unsubscribe(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, "Could not unsubscribe")
 	}
 
-	return c.JSON(http.StatusOK, "Unsubscribed successfully")
+	return c.Redirect(http.StatusFound, "https://0b2rlzx4-3000.use2.devtunnels.ms")
 }

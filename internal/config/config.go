@@ -44,7 +44,7 @@ func LoadConfig() Config {
 
 	return Config{
 		Server: ServerConfig{
-			Address: getEnv("SERVER_ADDRESS", ""),
+			Address: getEnv("SERVER_ADDRESS", "8080"),
 		},
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", ""),

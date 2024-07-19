@@ -2,8 +2,8 @@ package config
 
 import (
 	"log"
-
-	"github.com/spf13/viper"
+	"os"
+	"strconv"
 )
 
 type Config struct {
@@ -24,18 +24,21 @@ type DatabaseConfig struct {
 }
 
 func LoadConfig() Config {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Error loading config file: %v", err)
+	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
+	if err != nil {
+		log.Fatalf("Invalid port number: %v", err)
 	}
 
-	var config Config
-	if err := viper.Unmarshal(&config); err != nil {
-		log.Fatalf("Error unmarshalling config: %v", err)
+	return Config{
+		Server: ServerConfig{
+			Address: ":8080",
+		},
+		Database: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			Port:     port,
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			DBName:   os.Getenv("DB_NAME"),
+		},
 	}
-
-	return config
 }

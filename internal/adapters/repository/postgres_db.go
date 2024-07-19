@@ -1,36 +1,48 @@
-package config
+package repository
 
 import (
+	"fmt"
 	"log"
-	"os"
-	"strconv"
+
+	"github.com/EdwinPirajan/Unsuscribe.git/internal/config"
+	"github.com/EdwinPirajan/Unsuscribe.git/internal/core/domain"
+	"github.com/EdwinPirajan/Unsuscribe.git/internal/core/ports"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-type Config struct {
-	Database DatabaseConfig
+var DB *gorm.DB
+
+type DBRepository struct {
+	db *gorm.DB
 }
 
-type DatabaseConfig struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	DBName   string
-}
+func InitDB() {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
+		config.LoadConfig().Database.Host,
+		config.LoadConfig().Database.User,
+		config.LoadConfig().Database.Password,
+		config.LoadConfig().Database.DBName,
+		config.LoadConfig().Database.Port,
+		"disable",
+	)
 
-func LoadConfig() Config {
-	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
+	var err error
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Invalid port number: %v", err)
+		log.Fatalf("Failed to connect to the database: %v", err)
 	}
 
-	return Config{
-		Database: DatabaseConfig{
-			Host:     os.Getenv("DB_HOST"),
-			Port:     port,
-			User:     os.Getenv("DB_USER"),
-			Password: os.Getenv("DB_PASSWORD"),
-			DBName:   os.Getenv("DB_NAME"),
-		},
-	}
+	log.Println("Database connection established")
+
+	DB.AutoMigrate(&domain.Unsuscribe{})
+}
+
+func NewDBRepository() ports.UnsubscribeRepository {
+	return &DBRepository{db: DB}
+}
+
+func (r *DBRepository) SaveUnsubscribe(email string) error {
+	unsubscribe := domain.Unsuscribe{Email: email}
+	return r.db.Create(&unsubscribe).Error
 }

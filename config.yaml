@@ -1,0 +1,8 @@
+server:
+  address: ":8080"
+database:
+  host: "roundhouse.proxy.rlwy.net"
+  port: 20284
+  user: "postgres"
+  password: "yyZRxMHSifffhDpVWxeuhBvrJabzUkeT"
+  dbname: "railway"

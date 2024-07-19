@@ -1,49 +1,36 @@
-package repository
+package config
 
 import (
-	"fmt"
 	"log"
-
-	"github.com/EdwinPirajan/Unsuscribe.git/internal/config"
-	"github.com/EdwinPirajan/Unsuscribe.git/internal/core/domain"
-	"github.com/EdwinPirajan/Unsuscribe.git/internal/core/ports"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"os"
+	"strconv"
 )
 
-var DB *gorm.DB
-
-type DBRepository struct {
-	db *gorm.DB
+type Config struct {
+	Database DatabaseConfig
 }
 
-func InitDB() {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
-		config.LoadConfig().Database.Host,
-		config.LoadConfig().Database.User,
-		config.LoadConfig().Database.Password,
-		config.LoadConfig().Database.DBName,
-		config.LoadConfig().Database.Port,
-		"disable",
-	)
+type DatabaseConfig struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DBName   string
+}
 
-	var err error
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func LoadConfig() Config {
+	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
 	if err != nil {
-		log.Fatalf("Failed to connect to the database: %v", err)
+		log.Fatalf("Invalid port number: %v", err)
 	}
 
-	log.Println("Database connection established")
-
-	DB.AutoMigrate(&domain.Unsuscribe{})
-}
-
-func NewDBRepository() ports.UnsubscribeRepository {
-	return &DBRepository{db: DB}
-}
-
-// Implementar métodos del repositorio
-func (r *DBRepository) SaveUnsubscribe(email string) error {
-	unsubscribe := domain.Unsuscribe{Email: email}
-	return r.db.Create(&unsubscribe).Error
+	return Config{
+		Database: DatabaseConfig{
+			Host:     os.Getenv("DB_HOST"),
+			Port:     port,
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			DBName:   os.Getenv("DB_NAME"),
+		},
+	}
 }

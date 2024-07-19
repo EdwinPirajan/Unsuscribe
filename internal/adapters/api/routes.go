@@ -7,5 +7,5 @@ import (
 
 func RegisterRoutes(e *echo.Echo, service ports.UnsubscribeService) {
 	handler := NewHandler(service)
-	e.POST("/unsubscribe", handler.Unsubscribe)
+	e.GET("/unsubscribe", handler.Unsubscribe)
 }

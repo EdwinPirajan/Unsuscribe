@@ -16,16 +16,12 @@ func NewHandler(service ports.UnsubscribeService) *Handler {
 }
 
 func (h *Handler) Unsubscribe(c echo.Context) error {
-	type request struct {
-		Email string `json:"email"`
+	email := c.QueryParam("email")
+	if email == "" {
+		return c.JSON(http.StatusBadRequest, "Email is required")
 	}
 
-	var req request
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid request")
-	}
-
-	err := h.Service.Unsubscribe(req.Email)
+	err := h.Service.Unsubscribe(email)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "Could not unsubscribe")
 	}

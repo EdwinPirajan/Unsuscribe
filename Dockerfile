@@ -25,3 +25,5 @@ COPY --from=build /app/main .
 
 # Define el comando de inicio
 CMD ["./main"]
+
+

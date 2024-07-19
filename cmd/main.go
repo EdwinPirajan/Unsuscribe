@@ -6,6 +6,7 @@ import (
 	"github.com/EdwinPirajan/Unsuscribe.git/internal/config"
 	"github.com/EdwinPirajan/Unsuscribe.git/internal/core/services"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -15,6 +16,11 @@ func main() {
 	repository.InitDB()
 
 	e := echo.New()
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"}, // Permitir todos los orígenes, puedes ajustar esto según tus necesidades
+		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
+	}))
 
 	unsubscribeRepository := repository.NewDBRepository()
 	unsubscribeService := services.NewUnsubscribeService(unsubscribeRepository)

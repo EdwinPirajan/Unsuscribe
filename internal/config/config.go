@@ -35,7 +35,8 @@ func getEnv(key, defaultValue string) string {
 }
 
 func LoadConfig() Config {
-	port, err := strconv.Atoi(getEnv("DB_PORT", ""))
+	portStr := getEnv("DB_PORT", "")
+	port, err := strconv.Atoi(portStr)
 	if err != nil {
 		log.Fatalf("Invalid port number: %v", err)
 	}

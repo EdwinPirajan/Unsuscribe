@@ -1,17 +1,20 @@
-# Etapa de construcción
-FROM golang:1.22.2 AS build
+# Usa una imagen base de Go para la etapa de construcción
+FROM golang:1.22.2-alpine AS builder
 
-# Configura el directorio de trabajo
+# Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos del proyecto
+# Copia el go.mod y go.sum y descarga las dependencias
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copia el resto del código fuente
 COPY . .
 
-# Descarga las dependencias y compila el binario
-RUN go mod tidy
-RUN go build -o main ./cmd
+# Compila la aplicación
+RUN go build -o main ./cmd/main.go
 
-# Etapa final
+# Usa una imagen base más pequeña para el runtime
 FROM alpine:latest
 
 # Instala dependencias necesarias
@@ -20,10 +23,8 @@ RUN apk --no-cache add ca-certificates
 # Crea un directorio para la aplicación
 WORKDIR /root/
 
-# Copia el binario desde la etapa de construcción
-COPY --from=build /app/main .
+# Copia el binario compilado desde la etapa de construcción
+COPY --from=builder /app/main .
 
-# Define el comando de inicio
+# Establece el comando por defecto
 CMD ["./main"]
-
-

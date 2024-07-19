@@ -23,22 +23,33 @@ type DatabaseConfig struct {
 	DBName   string
 }
 
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		if defaultValue == "" {
+			log.Fatalf("Environment variable %s not set", key)
+		}
+		return defaultValue
+	}
+	return value
+}
+
 func LoadConfig() Config {
-	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
+	port, err := strconv.Atoi(getEnv("DB_PORT", ""))
 	if err != nil {
 		log.Fatalf("Invalid port number: %v", err)
 	}
 
 	return Config{
 		Server: ServerConfig{
-			Address: ":8080",
+			Address: getEnv("SERVER_ADDRESS", ":8080"),
 		},
 		Database: DatabaseConfig{
-			Host:     os.Getenv("DB_HOST"),
+			Host:     getEnv("DB_HOST", ""),
 			Port:     port,
-			User:     os.Getenv("DB_USER"),
-			Password: os.Getenv("DB_PASSWORD"),
-			DBName:   os.Getenv("DB_NAME"),
+			User:     getEnv("DB_USER", ""),
+			Password: getEnv("DB_PASSWORD", ""),
+			DBName:   getEnv("DB_NAME", ""),
 		},
 	}
 }

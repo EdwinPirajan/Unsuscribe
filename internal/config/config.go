@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 )
 
 type Config struct {
@@ -34,15 +35,16 @@ func getEnv(key, defaultValue string) string {
 }
 
 func LoadConfig() Config {
-	// portStr := getEnv("DB_PORT", "")
-	// port, err := strconv.Atoi(portStr)
-	// if err != nil {
-	// 	log.Fatalf("Invalid port number: %v", err)
-	// }
+	// Obtén el puerto de la base de datos desde la variable de entorno
+	portStr := getEnv("DB_PORT", "5432")
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		log.Fatalf("Invalid port number: %v", err)
+	}
 
 	return Config{
 		Server: ServerConfig{
-			Address: getEnv("SERVER_ADDRESS", ":8080"),
+			Address: getEnv("SERVER_ADDRESS", ""),
 		},
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", ""),

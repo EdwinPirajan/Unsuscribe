@@ -16,7 +16,7 @@ func main() {
 	cfg := config.LoadConfig()
 
 	// Inicializar la base de datos
-	repository.InitDB()
+	//repository.InitDB()
 
 	// Inicializar el servidor Echo
 	e := echo.New()
